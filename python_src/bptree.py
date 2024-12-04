@@ -38,6 +38,7 @@ class Node:
     def __str__(self):
         return f"Keys: {self.keys},  Children: {self.children},  IS_LEAF: {self.is_leaf}"
 
+# TODO: Tidy up, Pull out traversal code? See if it can be done better?
                 
 class BPTree:
     def __init__(self, order=3):
@@ -105,68 +106,3 @@ class BPTree:
                 
             return self.insert(current_node=parent_node, value=median_key, tree_traversed=True)
         return
-            
-
-
-                
-                
-
-                
-                
-
-
-
-
-
-
-
-# class BPTree:
-#     def __init__(self, order=3):
-#         self.order = order
-#         self.root = Node(order, is_leaf=True)
-    
-#     def insert(self, value, current_node: Node):
-
-#         if not current_node.is_leaf:
-#             for ind in range(len(current_node.keys)):
-#                 if value < current_node.keys[ind]:
-#                     child_index = ind
-#                     break
-            
-#             if child_index:
-#                 self.insert(value, current_node.children[child_index])
-#             else:
-#                 self.insert(value, current_node.children[-1])
-
-
-#         elif current_node.is_leaf:
-#             current_node.insert(value)
-        
-#             if len(current_node.keys) > current_node.max_num_keys:
-#                 median_index = math.ceil(len(current_node.keys) / 2)
-#                 split_node_keys = [current_node.keys[:median_index-1], current_node.keys[median_index-1:]]
-
-#                 new_leaf_nodes = []
-#                 for keys in split_node_keys:
-#                     new_leaf_node = Node(self.order, is_leaf=True)
-#                     new_leaf_node.keys = keys
-#                     new_leaf_nodes.append(new_leaf_node)
-
-#                 # Check if node has parent and push key to parent
-#                 if current_node.parent:
-#                     print("HAS PARENT")
-#                     # TODO: How to handle replacin new children??? !!!!!!
-#                     current_node.parent.children = new_leaf_nodes
-                    
-#                     self.insert(current_node.keys[median_index-1], current_node.parent)
-#                 else:
-#                     print("DOES NOT HAVE PARENT")
-#                     new_parent = Node(self.order, is_leaf=False)
-#                     new_parent.children = new_leaf_nodes
-#                     self.insert(current_node.keys[median_index-1], new_parent)
-
-#             return
-        
-        
-
-
