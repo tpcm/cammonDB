@@ -25,7 +25,10 @@ class Node:
                     break
     
     def split(self: "Node", median_ind: int) -> list:
-        split_nodes_keys = [self.keys[:median_ind], self.keys[median_ind:]]
+        if self.is_leaf:
+            split_nodes_keys = [self.keys[:median_ind], self.keys[median_ind:]]
+        else:
+            split_nodes_keys = [self.keys[:median_ind], self.keys[median_ind+1:]]
         first_node = Node(self.order, is_leaf=self.is_leaf)
         second_node = Node(self.order, is_leaf=self.is_leaf)
         first_node.keys = split_nodes_keys[0]
@@ -44,14 +47,10 @@ class BPTree:
 
     
     def insert(self, value: int, current_node: Node, tree_traversed: bool = False):
-        # print(current_node)
-
-        # TODO: Tree traversal
+        """"""
         if not tree_traversed:
             while not current_node.is_leaf:
                 if len(current_node.children) > 0:
-                    # print(current_node.children)
-                    # print(value)
                     child_index = None
                     for ind in range(len(current_node.keys)):
                         if value < current_node.keys[ind]:
@@ -75,7 +74,6 @@ class BPTree:
         if len(current_node.keys) >= self.order:
             median_ind = math.ceil(len(current_node.keys) / 2)
             median_key = current_node.keys[median_ind-1]
-            # print(median_key)
             split_nodes = current_node.split(median_ind-1)
 
             # If no parent node create one
@@ -84,27 +82,28 @@ class BPTree:
             else:
                 parent_node = self.traversed_nodes.pop()
 
-            # parent_node.insert(median_key)
             if self.root == current_node:
                 self.root = parent_node
             
-            # print("current_node children: ",current_node.children)
             # Migrate children to new parent node
-            if len(current_node.children) == 0:
+            if parent_node.children:
+                child_ind_to_remove = parent_node.children.index(current_node)
+                new_children = parent_node.children[:child_ind_to_remove] + split_nodes + parent_node.children[child_ind_to_remove+1:]
+                parent_node.children = new_children
+            else:
+                parent_node.children = split_nodes
+
+            if len(current_node.children) != 0:
+                for ind in range(len(current_node.children)):
+                    if current_node.children[ind].keys[0] == median_key:
+                        child_to_split_on = ind
+                        break
+
+                split_children = [current_node.children[:child_to_split_on], current_node.children[child_to_split_on:]]
+                split_nodes[0].children = split_children[0]
+                split_nodes[1].children = split_children[1]
                 
-            
-                if parent_node.children:
-                    # print("parent children: ", parent_node.children)
-                    child_ind_to_remove = parent_node.children.index(current_node)
-                    # print("child ind:", child_ind_to_remove)
-                    new_children = parent_node.children[:child_ind_to_remove] + split_nodes + parent_node.children[child_ind_to_remove+1:]
-                    # print("new children: ", new_children)
-                    parent_node.children = new_children
-                else:
-                    parent_node.children = split_nodes
             return self.insert(current_node=parent_node, value=median_key, tree_traversed=True)
-        # print(self.traversed_nodes)
-        # print(current_node)
         return
             
 
