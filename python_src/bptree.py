@@ -3,7 +3,6 @@ import math
 class Node:
     def __init__(self, order, is_leaf):
         self.order = order
-        self.max_num_keys = order - 1
         self.keys: list[int] = []
         # self.values: list[int] = []
         self.is_leaf: bool = is_leaf
@@ -38,36 +37,39 @@ class Node:
     def __str__(self):
         return f"Keys: {self.keys},  Children: {self.children},  IS_LEAF: {self.is_leaf}"
 
-# TODO: Tidy up, Pull out traversal code? See if it can be done better?
+# TODO: Tidy up, See if it can be done better?
                 
 class BPTree:
     def __init__(self, order=3):
         self.order = order
         self.root = Node(order, is_leaf=True)
         self.traversed_nodes: list[Node] = []
+    
+    def find_leaf_node(self, value: int, current_node: Node, tree_traversed: bool = False):
+        while not current_node.is_leaf:
+            if len(current_node.children) > 0:
+                child_index = None
+                for ind in range(len(current_node.keys)):
+                    if value < current_node.keys[ind]:
+                        child_index = ind
+                        break
 
+                if not current_node.is_leaf:
+                    self.traversed_nodes.append(current_node)
+                
+                if child_index:
+                    current_node = current_node.children[child_index]
+                else:
+                    current_node = current_node.children[-1]
+
+            if current_node.is_leaf:
+                tree_traversed = True
+        return current_node, tree_traversed
     
     def insert(self, value: int, current_node: Node, tree_traversed: bool = False):
         """"""
         if not tree_traversed:
-            while not current_node.is_leaf:
-                if len(current_node.children) > 0:
-                    child_index = None
-                    for ind in range(len(current_node.keys)):
-                        if value < current_node.keys[ind]:
-                            child_index = ind
-                            break
-
-                    if not current_node.is_leaf:
-                        self.traversed_nodes.append(current_node)
-                    
-                    if child_index:
-                        current_node = current_node.children[child_index]
-                    else:
-                        current_node = current_node.children[-1]
-
-                if current_node.is_leaf:
-                    tree_traversed = True
+            current_node, tree_traversed = self.find_leaf_node(value, current_node, tree_traversed)
 
         current_node.insert(value)
 
