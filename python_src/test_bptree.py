@@ -81,6 +81,6 @@ def test_tree_delete():
 
     bptree.delete(2, bptree.root)
     
-    assert bptree.root.keys == [4]
-    assert bptree.root.children[0].keys == [2]
-    assert bptree.root.children[1].keys == [4, 6]
+    assert bptree.root.keys == [6]
+    assert bptree.root.children[0].keys == [4]
+    assert bptree.root.children[1].keys == [6]

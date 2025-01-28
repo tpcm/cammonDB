@@ -65,10 +65,11 @@ class BPTree:
                         child_index = ind
                         break
 
+                
                 if not current_node.is_leaf:
                     self.traversed_nodes.append(current_node)
                 
-                if child_index:
+                if isinstance(child_index, int):
                     current_node = current_node.children[child_index]
                 else:
                     current_node = current_node.children[-1]
@@ -121,29 +122,44 @@ class BPTree:
 
     def redistribute(self: "BPTree", current_node: Node):
         parent_node = self.traversed_nodes[-1]
-
+        print("CHECK")
         current_node_index = parent_node.children.index(current_node)
         if len(parent_node.children) <= 1:
             return False
         if current_node_index != 0:
             sibling_node = parent_node.children[current_node_index - 1]
+            is_left_sibling = True
         else:
             sibling_node = parent_node.children[current_node_index + 1]
+            is_left_sibling = False
         
         # check sibling len
-        if len(sibling_node.keys) >= math.floor(self.order/2) and len(sibling_node.keys) < self.order:
+        if len(sibling_node.keys) > math.floor(self.order/2) and len(sibling_node.keys) < self.order:
             # redistribute
-        else:
-            # split sibling
-            if len(parent_node.children) == 2:
-                pass
-            # try other sibling
+            if is_left_sibling:
+                current_node.keys.insert(0, sibling_node.keys[-1])
+                sibling_node.keys.pop(-1)
+            else:
+                current_node.keys.append(sibling_node.keys[0])
+                # sibling_node.keys.pop(0)
+                # print(parent_node.keys[parent_node.keys.index(sibling_node.keys.pop(0))])
+                print(parent_node.keys[0])
+                print(current_node.keys[0])
+                print(parent_node.children[1].keys)
+                parent_node.keys[parent_node.keys.index(sibling_node.keys.pop(0))] = parent_node.children[1].keys[1]
+                print(parent_node.children[1].keys)
+                print(parent_node.keys[0])
+                print(parent_node.children[1].keys)
+        elif len(sibling_node.keys) <= math.floor(self.order/2) and len(sibling_node.keys) < self.order:
+            # merge
+            if is_left_sibling:
+                new_node = sibling_node + current_node
+            else:
+                new_node = current_node + sibling_node
+        # update parent node to account for change in keys
+
             
         
-
-        
-
-
     
     def delete(self: "BPTree", value: int, current_node: Node, tree_traversed: bool = False):
         if not tree_traversed:
@@ -153,7 +169,7 @@ class BPTree:
 
 
         # Check if node is less than half empty
-        if len(current_node.keys) >= math.floor(self.order/2):
+        if len(current_node.keys) > math.floor(self.order/2):
             return
         
         if self.redistribute(current_node):
